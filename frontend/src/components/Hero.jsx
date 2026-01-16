@@ -1,63 +1,63 @@
-import React, { useState, useEffect } from "react";
-import UploadPopup from "./UploadPopup";
-import ResourceCard from "./ResourceCard";
-import { supabase } from '../config/supabase';
-import SearchIcon from '../assets/search-icon.svg';
+import React, { useState, useEffect } from "react"
+import UploadPopup from "./UploadPopup"
+import ResourceCard from "./ResourceCard"
+import { API_BASE_URL } from '../config/api'
+import SearchIcon from '../assets/search-icon.svg'
 
 const Hero = () => {
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery.trim()) {
-        performSearch(searchQuery);
+        performSearch(searchQuery)
       } else {
-        setSearchResults([]);
-        setHasSearched(false);
+        setSearchResults([])
+        setHasSearched(false)
       }
-    }, 300);
+    }, 300)
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchQuery])
 
   const performSearch = async (query) => {
-    setIsSearching(true);
+    setIsSearching(true)
     try {
-      const { data, error } = await supabase
-        .from('resources')
-        .select('*')
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-        .order('created_at', { ascending: false });
+      const response = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`)
 
-      if (error) throw error;
-      setSearchResults(data);
-      setHasSearched(true);
+      if (!response.ok) {
+        throw new Error('Search failed')
+      }
+
+      const data = await response.json()
+      setSearchResults(data)
+      setHasSearched(true)
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Search error:', error)
     } finally {
-      setIsSearching(false);
+      setIsSearching(false)
     }
-  };
+  }
 
   const handleSearch = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim()) {
-      performSearch(searchQuery);
+      performSearch(searchQuery)
     }
-  };
+  }
 
   const openUploadPopup = () => {
-    setIsUploadOpen(true);
-  };
+    setIsUploadOpen(true)
+  }
 
   return (
     <>
-      <div className="relative h-[70vh] bg-cover bg-center text-white px-4 py-10 flex items-center" 
-           style={{ backgroundImage: 'url("https://cdn.pixabay.com/photo/2023/10/12/17/56/after-the-rain-8311416_1280.jpg")' }}>
+      <div className="relative h-[70vh] bg-cover bg-center text-white px-4 py-10 flex items-center"
+        style={{ backgroundImage: 'url("https://cdn.pixabay.com/photo/2023/10/12/17/56/after-the-rain-8311416_1280.jpg")' }}>
         <div className="absolute inset-0 bg-black/60 z-0"></div>
 
         <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 py-4">
@@ -74,11 +74,11 @@ const Hero = () => {
 
         <div className="z-10 mx-auto text-center max-w-4xl">
           <div>
-           
+
             <h1 className="text-4xl sm:text-6xl font-bold mb-8">
               Free web templates, Books & design assets
             </h1>
-            
+
             <p className="text-xl mb-8 text-gray-200">
               Discover thousands of free resources to build your next project
             </p>
@@ -92,7 +92,7 @@ const Hero = () => {
                   placeholder="Search NexLoad for free HTML templates, CSS tools, eBooks & more"
                   className="w-full px-6 py-4 rounded-full text-white bg-white/20 backdrop-blur-md focus:outline-none pr-12"
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   disabled={isSearching}
@@ -104,9 +104,9 @@ const Hero = () => {
           </div>
         </div>
 
-        <UploadPopup 
-          isOpen={isUploadOpen} 
-          onClose={() => setIsUploadOpen(false)} 
+        <UploadPopup
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
         />
       </div>
 
@@ -145,7 +145,7 @@ const Hero = () => {
         </div>
       )}
     </>
-  );
+  )
 }
 
-export default Hero;
+export default Hero

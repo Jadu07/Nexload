@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { supabase } from '../config/supabase';
+import React, { useState } from 'react'
+import { API_BASE_URL } from '../config/api'
 
 const categories = [
   { id: 'templates', name: 'Templates' },
@@ -10,9 +10,9 @@ const categories = [
   { id: 'themes', name: 'Themes' },
   { id: 'plugins', name: 'Plugins' },
   { id: 'graphics', name: 'Graphics' }
-];
+]
 
-const MAX_DESCRIPTION_LENGTH = 60;
+const MAX_DESCRIPTION_LENGTH = 60
 
 function UploadPopup({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -23,91 +23,75 @@ function UploadPopup({ isOpen, onClose }) {
     file: null,
     image: null,
     author: 'Anonymous'
-  });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  })
+  const [imagePreview, setImagePreview] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
+    const { name, value } = e.target
+
     if (name === 'description' && value.length > MAX_DESCRIPTION_LENGTH) {
-      return;
+      return
     }
 
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
+    }))
+  }
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      setFormData(prev => ({ ...prev, image: file }));
-      const reader = new FileReader();
+      setFormData(prev => ({ ...prev, image: file }))
+      const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
     }
-  };
-
-  const uploadFile = async (file, bucket, path) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).slice(2)}.${fileExt}`;
-    const filePath = `${path}/${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
-
-    if (error) throw error;
-
-    return bucket === 'resources' ? `${path}/${fileName}` : filePath;
-  };
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
 
     try {
-      const imagePath = await uploadFile(formData.image, 'covers', 'images');
-      
-      const filePath = await uploadFile(formData.file, 'resources', 'files');
+      if (!formData.file || !formData.image) {
+        throw new Error("File and Cover Image are required")
+      }
 
-      const { data: { publicUrl: imageUrl } } = supabase.storage
-        .from('covers')
-        .getPublicUrl(imagePath);
+      const formPayload = new FormData()
+      formPayload.append('title', formData.title)
+      formPayload.append('description', formData.description)
+      formPayload.append('category', formData.category)
+      formPayload.append('tags', formData.tags)
+      formPayload.append('author', formData.author)
+      formPayload.append('file', formData.file)
+      formPayload.append('image', formData.image)
 
-      const { data, error } = await supabase
-        .from('resources')
-        .insert([
-          {
-            title: formData.title,
-            description: formData.description,
-            category: formData.category,
-            tags: formData.tags.split(',').map(tag => tag.trim()),
-            image_url: imageUrl,
-            file_url: filePath, 
-            downloads: 0,
-            author: formData.author,
-            created_at: new Date().toISOString()
-          }
-        ]);
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        body: formPayload,
+      })
 
-      if (error) throw error;
-      onClose();
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to upload resource')
+      }
+
+      onClose()
     } catch (error) {
-      console.error('Upload error:', error);
-      setError('Failed to upload resource');
+      console.error('Upload error:', error)
+      setError(error.message)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -273,7 +257,7 @@ function UploadPopup({ isOpen, onClose }) {
         </form>
       </div>
     </div>
-  );
+  )
 }
 
-export default UploadPopup;
+export default UploadPopup

@@ -1,43 +1,43 @@
-import React, { useState, useEffect } from "react";
-import ResourceCard from "./ResourceCard";
-import { supabase } from '../config/supabase';
+import React, { useState, useEffect } from "react"
+import ResourceCard from "./ResourceCard"
+import { API_BASE_URL } from '../config/api'
 
 function LatestResources() {
-  const [resourceList, setResourceList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 8;
+  const [resourceList, setResourceList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [page, setPage] = useState(0)
+  const ITEMS_PER_PAGE = 8
 
   const fetchResources = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('resources')
-        .select('*')
-        .range(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE - 1)
-        .order('created_at', { ascending: false });
+      const response = await fetch(`${API_BASE_URL}/api/resources?page=${page}`)
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to fetch resources')
+      }
+
+      const data = await response.json()
 
       if (page === 0) {
-        setResourceList(data);
+        setResourceList(data)
       } else {
-        setResourceList(prev => [...prev, ...data]);
+        setResourceList(prev => [...prev, ...data])
       }
     } catch (error) {
-      console.error('Error fetching resources:', error);
+      console.error('Error fetching resources:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchResources();
-  }, [page]);
+    fetchResources()
+  }, [page])
 
   const loadMoreResources = () => {
-    setPage(prev => prev + 1);
-  };
+    setPage(prev => prev + 1)
+  }
 
   return (
     <section className="py-24 bg-white">
@@ -72,7 +72,7 @@ function LatestResources() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
-export default LatestResources;
+export default LatestResources
