@@ -1,6 +1,6 @@
-# React + Vite
+# Nexload
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern file upload and sharing application built with React and Supabase.
 
 Currently, two official plugins are available:
 
