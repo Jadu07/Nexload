@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { API_BASE_URL } from '../config/api'
+import { supabase } from '../config/supabase'
 
 const categories = [
   { id: 'templates', name: 'Templates' },
@@ -65,18 +66,57 @@ function UploadPopup({ isOpen, onClose }) {
         throw new Error("File and Cover Image are required")
       }
 
-      const formPayload = new FormData()
-      formPayload.append('title', formData.title)
-      formPayload.append('description', formData.description)
-      formPayload.append('category', formData.category)
-      formPayload.append('tags', formData.tags)
-      formPayload.append('author', formData.author)
-      formPayload.append('file', formData.file)
-      formPayload.append('image', formData.image)
+      // Upload Cover Image
+      const imageExt = formData.image.name.split('.').pop()
+      const imageName = `${Math.random().toString(36).slice(2)}.${imageExt}`
+      const imagePath = `images/${imageName}`
+
+      const { data: imageData, error: imageError } = await supabase.storage
+        .from('covers')
+        .upload(imagePath, formData.image)
+
+      if (imageError) throw imageError
+
+      const { data: { publicUrl: imageUrl } } = supabase.storage
+        .from('covers')
+        .getPublicUrl(imagePath)
+
+      // Upload Resource File
+      const fileExt = formData.file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).slice(2)}.${fileExt}`
+      const filePath = `files/${fileName}`
+
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('resources')
+        .upload(filePath, formData.file)
+
+      if (fileError) throw fileError
+
+      // Only sending the relative path as per previous backend logic, 
+      // but typically we might want the full URL or let backend handle it.
+      // Looking at server.js, it constructs file_url from the path it generates. 
+      // If we want to be consistent, we should send the path or URL.
+      // server.js saves `filePath` to `file_url` column.
+      // So let's send the path we created: `filePath`. 
+      // Actually, server.js used `images/${imageName}` as path. 
+      // Here we are using `images/${imageName}` too.
+
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        tags: formData.tags,
+        author: formData.author,
+        image_url: imageUrl,
+        file_path: filePath // Sending path so strict coherence with DB schema is maintained if it's text
+      }
 
       const response = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
-        body: formPayload,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {

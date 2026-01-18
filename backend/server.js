@@ -17,37 +17,13 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 
-app.post('/api/upload', upload.fields([{ name: 'file' }, { name: 'image' }]), async (req, res) => {
+app.post('/api/upload', async (req, res) => {
     try {
-        const { title, description, category, tags, author } = req.body
-        const file = req.files.file ? req.files.file[0] : null
-        const image = req.files.image ? req.files.image[0] : null
+        const { title, description, category, tags, author, image_url, file_path } = req.body
 
-        if (!file || !image) {
-            return res.status(400).json({ error: 'File and image are required' })
+        if (!image_url || !file_path) {
+            return res.status(400).json({ error: 'File and image info are required' })
         }
-
-        const imageExt = image.originalname.split('.').pop()
-        const imageName = `${Math.random().toString(36).slice(2)}.${imageExt}`
-        const imagePath = `images/${imageName}`
-        const { data: imageData, error: imageError } = await supabase.storage
-            .from('covers')
-            .upload(imagePath, image.buffer, { contentType: image.mimetype })
-
-        if (imageError) throw imageError
-
-        const { data: { publicUrl: imageUrl } } = supabase.storage
-            .from('covers')
-            .getPublicUrl(imagePath)
-
-        const fileExt = file.originalname.split('.').pop()
-        const fileName = `${Math.random().toString(36).slice(2)}.${fileExt}`
-        const filePath = `files/${fileName}`
-        const { data: fileData, error: fileError } = await supabase.storage
-            .from('resources')
-            .upload(filePath, file.buffer, { contentType: file.mimetype })
-
-        if (fileError) throw fileError
 
         const { data, error } = await supabase
             .from('resources')
@@ -57,8 +33,8 @@ app.post('/api/upload', upload.fields([{ name: 'file' }, { name: 'image' }]), as
                     description,
                     category,
                     tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-                    image_url: imageUrl,
-                    file_url: filePath,
+                    image_url: image_url,
+                    file_url: file_path,
                     downloads: 0,
                     author,
                     created_at: new Date().toISOString()
