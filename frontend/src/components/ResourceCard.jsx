@@ -9,7 +9,7 @@ export default function ResourceCard({ resource }) {
 
   const truncateDescription = (text) => {
     if (!text) return '';
-    return text.length > MAX_DESCRIPTION_LENGTH 
+    return text.length > MAX_DESCRIPTION_LENGTH
       ? text.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
       : text;
   };
@@ -18,14 +18,14 @@ export default function ResourceCard({ resource }) {
     setIsDownloading(true);
     try {
 
-      const filePath = resource.file_url.includes('resources/') 
+      const filePath = resource.file_url.includes('resources/')
         ? resource.file_url.match(/resources\/([^?#]+)/)[1]
         : resource.file_url;
 
       const { data, error } = await supabase
         .storage
         .from('resources')
-        .createSignedUrl(filePath, 60); 
+        .createSignedUrl(filePath, 60);
 
       if (error) throw error;
       if (!data?.signedUrl) throw new Error('Failed to generate signed URL');
@@ -49,7 +49,7 @@ export default function ResourceCard({ resource }) {
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative h-48">
-        <img 
+        <img
           src={resource.image_url}
           alt={resource.title}
           className="w-full h-full object-cover"
@@ -60,12 +60,12 @@ export default function ResourceCard({ resource }) {
           </span>
         </div>
       </div>
-      
+
       <div className="p-4">
         <h3 className="font-medium text-lg mb-2">
           {resource.title}
         </h3>
-        
+
         <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
           <span>{resource.author}</span>
           <span>{resource.downloads.toLocaleString()} downloads</span>
@@ -77,7 +77,7 @@ export default function ResourceCard({ resource }) {
 
         <div className="flex flex-wrap gap-2 mb-4">
           {resource.tags.map((tag, index) => (
-            <span 
+            <span
               key={index}
               className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md"
             >

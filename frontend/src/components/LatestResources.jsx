@@ -6,6 +6,7 @@ function LatestResources() {
   const [resourceList, setResourceList] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
   const ITEMS_PER_PAGE = 8
 
   const fetchResources = async () => {
@@ -23,6 +24,11 @@ function LatestResources() {
         setResourceList(data)
       } else {
         setResourceList(prev => [...prev, ...data])
+      }
+
+      // If we received fewer items than requested, there are no more resources
+      if (data.length < ITEMS_PER_PAGE) {
+        setHasMore(false)
       }
     } catch (error) {
       console.error('Error fetching resources:', error)
@@ -61,15 +67,17 @@ function LatestResources() {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <button
-            onClick={loadMoreResources}
-            disabled={isLoading}
-            className="bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Loading..." : "Load More"}
-          </button>
-        </div>
+        {hasMore && (
+          <div className="mt-16 text-center">
+            <button
+              onClick={loadMoreResources}
+              disabled={isLoading}
+              className="bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Loading..." : "Load More"}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )
