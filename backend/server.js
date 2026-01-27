@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
-import { createClient } from '@supabase/supabase-js'
+import { PrismaClient } from '@prisma/client'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000
 app.use(cors())
 app.use(express.json())
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const prisma = new PrismaClient()
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
@@ -25,24 +25,19 @@ app.post('/api/upload', async (req, res) => {
             return res.status(400).json({ error: 'File and image info are required' })
         }
 
-        const { data, error } = await supabase
-            .from('resources')
-            .insert([
-                {
-                    title,
-                    description,
-                    category,
-                    tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-                    image_url: image_url,
-                    file_url: file_path,
-                    downloads: 0,
-                    author,
-                    created_at: new Date().toISOString()
-                }
-            ])
-            .select()
-
-        if (error) throw error
+        const data = await prisma.resource.create({
+            data: {
+                title,
+                description,
+                category,
+                tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+                image_url: image_url,
+                file_url: file_path,
+                downloads: 0,
+                author,
+                created_at: new Date()
+            }
+        })
 
         res.status(200).json(data)
     } catch (error) {
@@ -55,16 +50,15 @@ app.get('/api/resources', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 0
         const limit = parseInt(req.query.limit) || 8
-        const start = page * limit
-        const end = start + limit - 1
+        const skip = page * limit
 
-        const { data, error } = await supabase
-            .from('resources')
-            .select('*')
-            .range(start, end)
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
+        const data = await prisma.resource.findMany({
+            skip: skip,
+            take: limit,
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
 
         res.json(data)
     } catch (error) {
@@ -78,13 +72,27 @@ app.get('/api/search', async (req, res) => {
         const query = req.query.q
         if (!query) return res.json([])
 
-        const { data, error } = await supabase
-            .from('resources')
-            .select('*')
-            .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
+        const data = await prisma.resource.findMany({
+            where: {
+                OR: [
+                    {
+                        title: {
+                            contains: query,
+                            mode: 'insensitive'
+                        }
+                    },
+                    {
+                        description: {
+                            contains: query,
+                            mode: 'insensitive'
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
 
         res.json(data)
     } catch (error) {

@@ -7,13 +7,17 @@
     "scripts": {
         "start": "node server.js",
         "dev": "node --watch server.js",
-        "build": "echo 'No build step'"
+        "build": "echo 'No build step'",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
-        "@supabase/supabase-js": "^2.48.1",
+        "@prisma/client": "^5.22.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "multer": "^1.4.5-lts.1"
+    },
+    "devDependencies": {
+        "prisma": "^5.22.0"
     }
 }

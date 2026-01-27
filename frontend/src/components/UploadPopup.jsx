@@ -66,11 +66,9 @@ function UploadPopup({ isOpen, onClose }) {
         throw new Error("File and Cover Image are required")
       }
 
-      // Upload Cover Image
       const imageExt = formData.image.name.split('.').pop()
       const imageName = `${Math.random().toString(36).slice(2)}.${imageExt}`
       const imagePath = `images/${imageName}`
-
       const { data: imageData, error: imageError } = await supabase.storage
         .from('covers')
         .upload(imagePath, formData.image)
@@ -81,7 +79,6 @@ function UploadPopup({ isOpen, onClose }) {
         .from('covers')
         .getPublicUrl(imagePath)
 
-      // Upload Resource File
       const fileExt = formData.file.name.split('.').pop()
       const fileName = `${Math.random().toString(36).slice(2)}.${fileExt}`
       const filePath = `files/${fileName}`
@@ -92,15 +89,6 @@ function UploadPopup({ isOpen, onClose }) {
 
       if (fileError) throw fileError
 
-      // Only sending the relative path as per previous backend logic, 
-      // but typically we might want the full URL or let backend handle it.
-      // Looking at server.js, it constructs file_url from the path it generates. 
-      // If we want to be consistent, we should send the path or URL.
-      // server.js saves `filePath` to `file_url` column.
-      // So let's send the path we created: `filePath`. 
-      // Actually, server.js used `images/${imageName}` as path. 
-      // Here we are using `images/${imageName}` too.
-
       const payload = {
         title: formData.title,
         description: formData.description,
@@ -108,7 +96,7 @@ function UploadPopup({ isOpen, onClose }) {
         tags: formData.tags,
         author: formData.author,
         image_url: imageUrl,
-        file_path: filePath // Sending path so strict coherence with DB schema is maintained if it's text
+        file_path: filePath 
       }
 
       const response = await fetch(`${API_BASE_URL}/api/upload`, {
