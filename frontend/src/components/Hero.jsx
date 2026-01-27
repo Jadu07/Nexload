@@ -94,10 +94,10 @@ const Hero = () => {
                 />
                 <button
                   type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
                   disabled={isSearching}
                 >
-                  <img src={SearchIcon} alt="Search" className="w-6 h-6 text-white" />
+                  <img src={SearchIcon} alt="Search" className="w-6 h-6" />
                 </button>
               </div>
             </form>
