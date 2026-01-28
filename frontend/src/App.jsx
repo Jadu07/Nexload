@@ -12,6 +12,7 @@ import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/auth/current_user`, { credentials: 'include' })
@@ -29,8 +30,27 @@ export default function App() {
       .catch(err => {
         console.error("Error fetching user:", err);
         setUser(null);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return (
+      <div style={{
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000',
+        color: '#fff'
+      }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <Router>
