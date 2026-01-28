@@ -19,9 +19,6 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 const app = express()
 const port = process.env.PORT || 3000
 
-// Initialize Prisma Client once
-const prisma = new PrismaClient()
-
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
@@ -37,7 +34,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new PrismaSessionStore(
-        prisma,
+        new PrismaClient(),
         {
             checkPeriod: 2 * 60 * 1000, // 2 minutes
             dbRecordIdIsSessionId: true,
@@ -53,6 +50,8 @@ app.use(session({
 
 app.use(passport.initialize())
 app.use(passport.session())
+
+const prisma = new PrismaClient()
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
