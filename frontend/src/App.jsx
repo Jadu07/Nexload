@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import { API_BASE_URL } from "./config/api";
 import Navbar from "./components/Navbar";
 import Profile from "./components/Profile";
@@ -47,7 +48,7 @@ export default function App() {
         backgroundColor: '#000',
         color: '#fff'
       }}>
-        Loading...
+        <Loader2 className="animate-spin" size={48} />
       </div>
     );
   }
