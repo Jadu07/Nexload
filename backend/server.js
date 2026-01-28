@@ -46,14 +46,14 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Successful authentication, redirect home.
-        res.redirect('http://localhost:5173') // Adjust to your frontend URL
+        res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173')
     }
 )
 
 app.get('/auth/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) { return next(err); }
-        res.redirect('http://localhost:5173');
+        res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
     });
 });
 
