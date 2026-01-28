@@ -8,6 +8,14 @@ import passport from './config/passport.js'
 
 dotenv.config()
 
+import { PrismaSessionStore } from '@quixo3/prisma-session-store'
+
+// ... imports remain the same
+
+// Reuse existing prisma instance or create new if needed, but here we'll use the one created later or create a temporary one for the store if structure demands.
+// Actually better to move the prisma instantiation up if needed or just instantiate new one inside store. 
+// Let's modify the imports and the session config block.
+
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -19,16 +27,24 @@ app.use(cors({
 }))
 app.use(express.json())
 
-app.set('trust proxy', 1) // Trust first proxy for Vercel deployment
+app.set('trust proxy', 1)
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_secret_key',
     resave: false,
     saveUninitialized: false,
+    store: new PrismaSessionStore(
+        new PrismaClient(),
+        {
+            checkPeriod: 2 * 60 * 1000, // 2 minutes
+            dbRecordIdIsSessionId: true,
+            dbRecordIdFunction: undefined,
+        }
+    ),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000
     }
 }))
 
