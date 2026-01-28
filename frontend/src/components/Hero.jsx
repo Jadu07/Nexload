@@ -4,7 +4,7 @@ import ResourceCard from "./ResourceCard"
 import { API_BASE_URL } from '../config/api'
 import SearchIcon from '../assets/search-icon.svg'
 
-const Hero = () => {
+const Hero = ({ user }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
@@ -61,6 +61,25 @@ const Hero = () => {
           <div className="text-3xl font-bold tracking-widest">
             <span className="font-extrabold text-4xl">NEXLOAD</span>
           </div>
+          {!user ? (
+            <button
+              onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
+              className="px-6 py-2 rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
+            >
+              Login
+            </button>
+          ) : (
+            <div className="flex items-center gap-4">
+              <span className="text-white font-medium">{user.displayName}</span>
+              {user.image && <img src={user.image} alt={user.displayName} className="w-8 h-8 rounded-full" />}
+              <button
+                onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}
+                className="px-4 py-2 rounded-full border border-white text-white hover:bg-white/10 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          )}
 
         </div>
 
