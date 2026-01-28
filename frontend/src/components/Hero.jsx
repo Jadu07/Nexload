@@ -58,38 +58,6 @@ const Hero = ({ user }) => {
         style={{ backgroundImage: 'url("https://cdn.pixabay.com/photo/2023/10/12/17/56/after-the-rain-8311416_1280.jpg")' }}>
         <div className="absolute inset-0 bg-black/60 z-0"></div>
 
-        <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 py-4">
-          <div className="text-3xl font-bold tracking-widest">
-            <span className="font-extrabold text-4xl">NEXLOAD</span>
-          </div>
-          {!user ? (
-            <button
-              onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
-              className="px-6 py-2 rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
-            >
-              Login
-            </button>
-          ) : (
-            <div className="flex items-center gap-4">
-              <span className="text-white font-medium">{user.displayName}</span>
-              {user.image && <img src={user.image} alt={user.displayName} className="w-8 h-8 rounded-full" />}
-              <button
-                onClick={() => setIsUploadOpen(true)}
-                className="px-6 py-2 rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
-              >
-                Upload
-              </button>
-              <button
-                onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}
-                className="px-4 py-2 rounded-full border border-white text-white hover:bg-white/10 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-
-        </div>
-
         <div className="z-10 mx-auto text-center max-w-4xl">
           <div>
 
