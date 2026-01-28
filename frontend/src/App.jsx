@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "./config/api";
+import Navbar from "./components/Navbar";
+import Profile from "./components/Profile";
 import Hero from "./components/Hero";
 import Categories from "./components/Categories";
 import LatestResources from "./components/LatestResources";
@@ -7,6 +9,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [currentView, setCurrentView] = useState('home');
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/auth/current_user`, { credentials: 'include' })
@@ -29,10 +32,17 @@ export default function App() {
 
   return (
     <>
+      <Navbar user={user} onNavigate={setCurrentView} />
       <main>
-        <Hero user={user} />
-        <Categories />
-        <LatestResources />
+        {currentView === 'home' ? (
+          <>
+            <Hero user={user} />
+            <Categories />
+            <LatestResources />
+          </>
+        ) : (
+          <Profile user={user} />
+        )}
       </main>
       <Footer />
     </>
