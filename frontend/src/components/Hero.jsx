@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react"
-import UploadPopup from "./UploadPopup"
+
 import ResourceCard from "./ResourceCard"
 import { API_BASE_URL } from '../config/api'
 import SearchIcon from '../assets/search-icon.svg'
 
 const Hero = () => {
-  const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
@@ -50,9 +49,7 @@ const Hero = () => {
     }
   }
 
-  const openUploadPopup = () => {
-    setIsUploadOpen(true)
-  }
+
 
   return (
     <>
@@ -64,12 +61,7 @@ const Hero = () => {
           <div className="text-3xl font-bold tracking-widest">
             <span className="font-extrabold text-4xl">NEXLOAD</span>
           </div>
-          <button
-            onClick={openUploadPopup}
-            className="px-6 py-2 rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
-          >
-            Upload
-          </button>
+
         </div>
 
         <div className="z-10 mx-auto text-center max-w-4xl">
@@ -104,10 +96,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <UploadPopup
-          isOpen={isUploadOpen}
-          onClose={() => setIsUploadOpen(false)}
-        />
+
       </div>
 
       {hasSearched && (
@@ -128,17 +117,7 @@ const Hero = () => {
                 <p className="text-xl text-gray-600 mb-8">
                   We couldn't find any resources matching your search.
                 </p>
-                <div className="flex flex-col items-center gap-4">
-                  <p className="text-lg">
-                    Have this resource? Share it with the community!
-                  </p>
-                  <button
-                    onClick={openUploadPopup}
-                    className="px-8 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
-                  >
-                    Upload Resource
-                  </button>
-                </div>
+
               </div>
             )}
           </div>
