@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Upload, ChevronDown, User, LogOut } from 'lucide-react';
 import { API_BASE_URL } from '../config/api';
 import UploadPopup from './UploadPopup';
@@ -7,6 +8,7 @@ const Navbar = ({ user, onNavigate }) => {
     const [isUploadOpen, setIsUploadOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const navigate = useNavigate();
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -19,19 +21,24 @@ const Navbar = ({ user, onNavigate }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const handleProfileClick = () => {
+        navigate('/profile');
+        setIsProfileMenuOpen(false);
+    };
+
     return (
         <>
             <nav className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
                     {/* Logo */}
-                    <div
+                    <Link
+                        to="/"
                         className="flex items-center gap-2 cursor-pointer group"
-                        onClick={() => onNavigate('home')}
                     >
                         <div className="text-2xl font-bold tracking-widest text-white group-hover:text-gray-200 transition-colors">
                             <span className="font-extrabold text-3xl">NEXLOAD</span>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* Right Side Actions */}
                     <div className="flex items-center gap-6">
@@ -88,10 +95,7 @@ const Navbar = ({ user, onNavigate }) => {
 
                                             <div className="py-1">
                                                 <button
-                                                    onClick={() => {
-                                                        onNavigate('profile');
-                                                        setIsProfileMenuOpen(false);
-                                                    }}
+                                                    onClick={handleProfileClick}
                                                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                                 >
                                                     <User className="h-4 w-4 text-gray-400" />
