@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-
+import UploadPopup from "./UploadPopup"
 import ResourceCard from "./ResourceCard"
 import { API_BASE_URL } from '../config/api'
 import SearchIcon from '../assets/search-icon.svg'
@@ -9,6 +9,7 @@ const Hero = ({ user }) => {
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -73,6 +74,12 @@ const Hero = ({ user }) => {
               <span className="text-white font-medium">{user.displayName}</span>
               {user.image && <img src={user.image} alt={user.displayName} className="w-8 h-8 rounded-full" />}
               <button
+                onClick={() => setIsUploadOpen(true)}
+                className="px-6 py-2 rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
+              >
+                Upload
+              </button>
+              <button
                 onClick={() => window.location.href = `${API_BASE_URL}/auth/logout`}
                 className="px-4 py-2 rounded-full border border-white text-white hover:bg-white/10 transition-colors"
               >
@@ -117,6 +124,8 @@ const Hero = ({ user }) => {
 
 
       </div>
+
+      <UploadPopup isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
 
       {hasSearched && (
         <div className="py-12 bg-white">
