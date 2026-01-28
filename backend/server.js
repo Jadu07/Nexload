@@ -12,7 +12,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.use(cors({
-    origin: 'https://nexload.vercel.app',
+    origin: 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -46,14 +46,14 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Successful authentication, redirect home.
-        res.redirect('https://nexload.vercel.app') // Adjust to your frontend URL
+        res.redirect('http://localhost:5173') // Adjust to your frontend URL
     }
 )
 
 app.get('/auth/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) { return next(err); }
-        res.redirect('https://nexload.vercel.app/');
+        res.redirect('http://localhost:5173');
     });
 });
 
