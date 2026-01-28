@@ -99,6 +99,26 @@ app.post('/api/upload', ensureAuthenticated, async (req, res) => {
     }
 })
 
+app.get('/api/user/resources', ensureAuthenticated, async (req, res) => {
+    try {
+        const userId = req.user.id
+
+        const data = await prisma.resource.findMany({
+            where: {
+                userId: userId
+            },
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
+
+        res.json(data)
+    } catch (error) {
+        console.error('Fetch user resources error:', error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 app.get('/api/resources', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 0
@@ -150,6 +170,84 @@ app.get('/api/search', async (req, res) => {
         res.json(data)
     } catch (error) {
         console.error('Search error:', error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.put('/api/resources/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const resourceId = parseInt(req.params.id)
+        const userId = req.user.id
+        const { title, description, category, tags, image_url, file_path } = req.body
+
+        // Check if resource exists and belongs to user
+        const resource = await prisma.resource.findUnique({
+            where: { id: resourceId }
+        })
+
+        if (!resource) {
+            return res.status(404).json({ error: 'Resource not found' })
+        }
+
+        if (resource.userId !== userId) {
+            return res.status(403).json({ error: 'Unauthorized to edit this resource' })
+        }
+
+        // Build update data object
+        const updateData = {
+            title,
+            description,
+            category,
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : []
+        }
+
+        // Add image_url and file_url if provided
+        if (image_url) {
+            updateData.image_url = image_url
+        }
+        if (file_path) {
+            updateData.file_url = file_path
+        }
+
+        // Update resource
+        const updatedResource = await prisma.resource.update({
+            where: { id: resourceId },
+            data: updateData
+        })
+
+        res.json(updatedResource)
+    } catch (error) {
+        console.error('Update error:', error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/api/resources/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const resourceId = parseInt(req.params.id)
+        const userId = req.user.id
+
+        // Check if resource exists and belongs to user
+        const resource = await prisma.resource.findUnique({
+            where: { id: resourceId }
+        })
+
+        if (!resource) {
+            return res.status(404).json({ error: 'Resource not found' })
+        }
+
+        if (resource.userId !== userId) {
+            return res.status(403).json({ error: 'Unauthorized to delete this resource' })
+        }
+
+        // Delete resource from database
+        await prisma.resource.delete({
+            where: { id: resourceId }
+        })
+
+        res.json({ message: 'Resource deleted successfully' })
+    } catch (error) {
+        console.error('Delete error:', error)
         res.status(500).json({ error: error.message })
     }
 })

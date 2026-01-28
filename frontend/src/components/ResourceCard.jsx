@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { Download, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../config/supabase';
-import LoadingSpinner from '../assets/loading-spinner.svg';
-import DownloadIcon from '../assets/download-icon.svg';
+import { API_BASE_URL } from '../config/api';
 
-export default function ResourceCard({ resource }) {
+export default function ResourceCard({ resource, currentUser, onEdit, onDelete }) {
   const [isDownloading, setIsDownloading] = useState(false);
   const MAX_DESCRIPTION_LENGTH = 60;
+
+  const isOwner = currentUser && resource.userId === currentUser.id;
 
   const truncateDescription = (text) => {
     if (!text) return '';
@@ -46,6 +48,30 @@ export default function ResourceCard({ resource }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this resource?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/resources/${resource.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete resource');
+      }
+
+      if (onDelete) {
+        onDelete(resource.id);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete resource. Please try again.');
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative h-48">
@@ -59,6 +85,24 @@ export default function ResourceCard({ resource }) {
             {resource.category}
           </span>
         </div>
+        {isOwner && (
+          <div className="absolute top-3 right-3 flex gap-2">
+            <button
+              onClick={() => onEdit(resource)}
+              className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+              title="Edit resource"
+            >
+              <Edit2 className="w-4 h-4 text-gray-700" />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+              title="Delete resource"
+            >
+              <Trash2 className="w-4 h-4 text-red-600" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="p-4">
@@ -93,12 +137,12 @@ export default function ResourceCard({ resource }) {
         >
           {isDownloading ? (
             <>
-              <img src={LoadingSpinner} alt="Loading" className="animate-spin h-5 w-5 text-white" />
+              <Loader2 className="animate-spin h-5 w-5" />
               <span>Downloading...</span>
             </>
           ) : (
             <>
-              <img src={DownloadIcon} alt="Download" className="w-5 h-5" />
+              <Download className="w-5 h-5" />
               <span>Download</span>
             </>
           )}
