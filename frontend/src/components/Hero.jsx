@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react"
+import { Search } from 'lucide-react'
 import UploadPopup from "./UploadPopup"
 import ResourceCard from "./ResourceCard"
 import { API_BASE_URL } from '../config/api'
-import SearchIcon from '../assets/search-icon.svg'
 
 const Hero = ({ user }) => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -83,7 +83,7 @@ const Hero = ({ user }) => {
                   className="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
                   disabled={isSearching}
                 >
-                  <img src={SearchIcon} alt="Search" className="w-6 h-6" />
+                  <Search className="w-6 h-6" />
                 </button>
               </div>
             </form>
