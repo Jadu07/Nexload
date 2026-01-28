@@ -54,25 +54,30 @@ const categoriesData = [
 
 function Categories() {
   const [categories, setCategories] = useState([]);
-  
+
   useEffect(() => {
     const fetchCategories = async () => {
-      const { data, error } = await supabase
-        .from('resources')
-        .select('category')
-        .then(async ({ data, error }) => {
-          if (error) throw error;
-          
-          const counts = {};
+      try {
+        const { data, error } = await supabase
+          .from('resources')
+          .select('category');
+
+        if (error) throw error;
+
+        const counts = {};
+        if (data) {
           data.forEach(item => counts[item.category] = (counts[item.category] || 0) + 1);
+        }
 
-          const updatedCategories = categoriesData.map(cat => ({
-            ...cat,
-            count: counts[cat.id] || 0
-          }));
+        const updatedCategories = categoriesData.map(cat => ({
+          ...cat,
+          count: counts[cat.id] || 0
+        }));
 
-          setCategories(updatedCategories);
-        });
+        setCategories(updatedCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
     };
 
     fetchCategories();
@@ -83,12 +88,12 @@ function Categories() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="max-w-3xl mx-auto mb-20">
           <div className="space-y-4 text-center">
-           
-            
+
+
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 tracking-tight">
               Browse Categories
             </h2>
-            
+
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Explore our handpicked collection of premium resources for your next project
             </p>
@@ -98,13 +103,13 @@ function Categories() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
-            <div 
+            <div
               key={category.id}
               className="group cursor-pointer"
             >
               <div className="relative overflow-hidden rounded-xl aspect-[4/3]">
-                <img 
-                  src={category.image} 
+                <img
+                  src={category.image}
                   alt={category.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />

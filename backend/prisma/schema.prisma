@@ -21,6 +21,20 @@ model Resource {
   downloads   Int      @default(0)
   author      String?
   created_at  DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?
 
   @@map("resources")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  googleId    String   @unique
+  email       String   @unique
+  displayName String
+  image       String?
+  createdAt   DateTime @default(now())
+  resources   Resource[]
+
+  @@map("users")
 }
