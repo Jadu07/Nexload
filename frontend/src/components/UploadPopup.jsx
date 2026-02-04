@@ -105,7 +105,8 @@ function UploadPopup({ isOpen, onClose, editResource = null, onUpdate = null }) 
 
         // Upload new image if provided
         if (formData.image) {
-          const imageFileName = `${Date.now()}_${formData.image.name}`
+          const sanitizedImageName = formData.image.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+          const imageFileName = `${Date.now()}_${sanitizedImageName}`
           const { error: imageError } = await supabase
             .storage
             .from('resources')
@@ -123,7 +124,8 @@ function UploadPopup({ isOpen, onClose, editResource = null, onUpdate = null }) 
 
         // Upload new file if provided
         if (formData.file) {
-          const fileFileName = `${Date.now()}_${formData.file.name}`
+          const sanitizedFileName = formData.file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+          const fileFileName = `${Date.now()}_${sanitizedFileName}`
           const { error: fileError } = await supabase
             .storage
             .from('resources')
@@ -176,7 +178,8 @@ function UploadPopup({ isOpen, onClose, editResource = null, onUpdate = null }) 
         }
 
         // Upload image to Supabase
-        const imageFileName = `${Date.now()}_${formData.image.name}`
+        const sanitizedImageName = formData.image.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const imageFileName = `${Date.now()}_${sanitizedImageName}`
         const { data: imageData, error: imageError } = await supabase
           .storage
           .from('resources')
@@ -190,7 +193,8 @@ function UploadPopup({ isOpen, onClose, editResource = null, onUpdate = null }) 
           .getPublicUrl(imageFileName)
 
         // Upload file to Supabase
-        const fileFileName = `${Date.now()}_${formData.file.name}`
+        const sanitizedFileName = formData.file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const fileFileName = `${Date.now()}_${sanitizedFileName}`
         const { data: fileData, error: fileError } = await supabase
           .storage
           .from('resources')

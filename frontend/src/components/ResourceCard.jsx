@@ -21,7 +21,7 @@ export default function ResourceCard({ resource, currentUser, onEdit, onDelete }
     try {
 
       const filePath = resource.file_url.includes('resources/')
-        ? resource.file_url.match(/resources\/([^?#]+)/)[1]
+        ? decodeURIComponent(resource.file_url.match(/resources\/([^?#]+)/)[1])
         : resource.file_url;
 
       const { data, error } = await supabase
