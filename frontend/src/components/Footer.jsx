@@ -17,7 +17,7 @@ export default function Footer() {
               NEXLOAD
             </Link>
             <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mb-8">
-              The premier destination for high-quality design resources. Empowering creators with curated assets for their next big project.
+              The premier destination for high-quality developer resources. Empowering creators with curated assets for their next big project.
             </p>
             <div className="flex items-center gap-4">
               <SocialLink href="https://medium.com/@jadu07" icon={<BookOpen size={20} />} label="Medium" />
@@ -56,7 +56,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-zinc-500 text-sm">
-            © {currentYear} nexload.vercel.app. All rights reserved.
+            Nexload © {currentYear} rights reserved.
           </div>
           <div className="flex gap-6 text-sm text-zinc-500">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
