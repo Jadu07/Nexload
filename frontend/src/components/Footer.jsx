@@ -47,9 +47,9 @@ export default function Footer() {
             <div className="flex flex-col gap-4">
               <h3 className="font-bold text-white tracking-wide">Company</h3>
               <FooterLink to="/about">About Us</FooterLink>
-              <FooterLink to="/blog">Blog</FooterLink>
+              <a href="https://medium.com/@jadu07" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition-colors duration-200 text-sm">Blog</a>
               <FooterLink to="/careers">Careers</FooterLink>
-              <FooterLink to="/contact">Contact</FooterLink>
+              <a href="mailto:yashrajchouhan14@gmail.com" className="text-zinc-400 hover:text-white transition-colors duration-200 text-sm">Contact</a>
             </div>
           </div>
         </div>
