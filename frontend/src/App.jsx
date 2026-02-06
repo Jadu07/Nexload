@@ -8,6 +8,7 @@ import Hero from "./components/Hero";
 import Categories from "./components/Categories";
 import CategoryPage from "./components/CategoryPage";
 import LatestResources from "./components/LatestResources";
+import ResourceDetails from "./components/ResourceDetails"; // Import the new component
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/themes" element={<CategoryPage categoryId="themes" />} />
           <Route path="/plugins" element={<CategoryPage categoryId="plugins" />} />
           <Route path="/graphics" element={<CategoryPage categoryId="graphics" />} />
+          <Route path="/resource/:id" element={<ResourceDetails />} /> {/* Add the route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

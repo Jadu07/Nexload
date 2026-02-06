@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Download, Loader2, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../config/supabase';
 import { API_BASE_URL } from '../config/api';
 
 export default function ResourceCard({ resource, currentUser, onEdit, onDelete }) {
+  const navigate = useNavigate();
   const [isDownloading, setIsDownloading] = useState(false);
   const MAX_DESCRIPTION_LENGTH = 60;
 
@@ -72,13 +74,24 @@ export default function ResourceCard({ resource, currentUser, onEdit, onDelete }
     }
   };
 
+  const handleCardClick = (e) => {
+    // Prevent navigation if clicking on download, edit, or delete buttons
+    if (e.target.closest('button')) {
+      return;
+    }
+    navigate(`/resource/${resource.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative h-48">
+    <div
+      onClick={handleCardClick}
+      className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+    >
+      <div className="relative h-48 overflow-hidden">
         <img
           src={resource.image_url}
           alt={resource.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 left-3">
           <span className="text-xs font-medium text-white px-2 py-1 bg-black/50 rounded-md">

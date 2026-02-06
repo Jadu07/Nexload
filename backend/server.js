@@ -194,6 +194,33 @@ app.get('/api/search', async (req, res) => {
     }
 })
 
+app.get('/api/resources/:id', async (req, res) => {
+    try {
+        const resourceId = parseInt(req.params.id)
+
+        const resource = await prisma.resource.findUnique({
+            where: { id: resourceId },
+            include: {
+                user: {
+                    select: {
+                        image: true,
+                        displayName: true
+                    }
+                }
+            }
+        })
+
+        if (!resource) {
+            return res.status(404).json({ error: 'Resource not found' })
+        }
+
+        res.json(resource)
+    } catch (error) {
+        console.error('Fetch resource error:', error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
 app.put('/api/resources/:id', ensureAuthenticated, async (req, res) => {
     try {
         const resourceId = parseInt(req.params.id)
