@@ -10,16 +10,9 @@ dotenv.config()
 
 import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 
-// ... imports remain the same
-
-// Reuse existing prisma instance or create new if needed, but here we'll use the one created later or create a temporary one for the store if structure demands.
-// Actually better to move the prisma instantiation up if needed or just instantiate new one inside store. 
-// Let's modify the imports and the session config block.
-
 const app = express()
 const port = process.env.PORT || 3000
 
-// Initialize Prisma Client ONCE
 const prisma = new PrismaClient()
 
 app.use(cors({
@@ -217,6 +210,29 @@ app.get('/api/resources/:id', async (req, res) => {
         res.json(resource)
     } catch (error) {
         console.error('Fetch resource error:', error)
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.get('/api/stats', async (req, res) => {
+    try {
+        const [resourceCount, userCount, downloadData] = await Promise.all([
+            prisma.resource.count(),
+            prisma.user.count(),
+            prisma.resource.aggregate({
+                _sum: {
+                    downloads: true
+                }
+            })
+        ])
+
+        res.json({
+            resources: resourceCount,
+            users: userCount,
+            downloads: downloadData._sum.downloads || 0
+        })
+    } catch (error) {
+        console.error('Stats error:', error)
         res.status(500).json({ error: error.message })
     }
 })
