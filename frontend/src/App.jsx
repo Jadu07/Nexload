@@ -11,6 +11,7 @@ import LatestResources from "./components/LatestResources";
 import ResourceDetails from "./components/ResourceDetails";
 import About from "./components/About";
 import Footer from "./components/Footer";
+import Careers from "./components/Careers";
 import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/graphics" element={<CategoryPage categoryId="graphics" />} />
           <Route path="/resource/:id" element={<ResourceDetails />} />
           <Route path="/about" element={<About />} />
+          <Route path="/careers" element={<Careers user={user} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
